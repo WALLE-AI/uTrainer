@@ -18,15 +18,24 @@ const { useState } = React;
 
 const App = () => {
     const [activeView, setActiveView] = useState('看板');
+    const [navigationParams, setNavigationParams] = useState<any>(null);
+
+    const handleNavigate = (view: string, params: any = null) => {
+        setActiveView(view);
+        setNavigationParams(params);
+    };
 
     const renderContent = () => {
         switch (activeView) {
             case '看板':
-                return <Dashboard />;
+                return <Dashboard onNavigate={handleNavigate} />;
             case '数据平台':
-                return <DataPlatform />;
+            case '数据中心':
+                return <DataPlatform params={{ ...navigationParams, initialView: 'library' }} onNavigate={handleNavigate} />;
+            case '数据构建工作室':
+                return <DataPlatform params={{ ...navigationParams, initialView: 'lab' }} onNavigate={handleNavigate} />;
             case '训练':
-                return <Training />;
+                return <Training params={navigationParams} onNavigate={handleNavigate} />;
             case '推理与部署':
                 return <InferenceDeployment />;
             case '模型 Benchmark':
@@ -46,10 +55,10 @@ const App = () => {
     };
 
     return (
-        <div 
+        <div
             className="flex h-screen bg-gray-100 text-gray-800 font-sans"
         >
-            <SideNav activeView={activeView} setActiveView={setActiveView} />
+            <SideNav activeView={activeView} setActiveView={(view: string) => handleNavigate(view)} />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <TopBar />
                 <main className="flex-1 overflow-y-auto p-8">

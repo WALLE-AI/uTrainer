@@ -4,7 +4,7 @@
 */
 import React from 'react';
 import { Icon, ICONS, FormSection, InputField, SelectField } from './shared';
-const { useState } = React;
+const { useState, useEffect } = React;
 
 const steps = [
     { id: 1, name: '引擎' },
@@ -42,7 +42,7 @@ const StepIndicator = ({ currentStep }) => (
                         </div>
                     )}
                     {stepIdx !== steps.length - 1 && (
-                         <div className="hidden md:block w-8 h-px bg-gray-300 mx-2"></div>
+                        <div className="hidden md:block w-8 h-px bg-gray-300 mx-2"></div>
                     )}
                 </li>
             ))}
@@ -58,7 +58,7 @@ const Card: React.FC<{
     onSelect: (title: string) => void;
     children?: React.ReactNode;
     colSpan?: string;
-}> = ({ title, description, selected, onSelect, children=null, colSpan='col-span-1' }) => (
+}> = ({ title, description, selected, onSelect, children = null, colSpan = 'col-span-1' }) => (
     <div onClick={() => onSelect(title)} className={`p-4 border rounded-lg cursor-pointer transition-all relative ${colSpan} ${selected ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500' : 'border-gray-300 bg-white hover:border-gray-400'}`}>
         <h4 className="font-bold text-gray-800">{title}</h4>
         <p className="text-xs text-gray-500 mt-1">{description}</p>
@@ -72,14 +72,14 @@ const Step1_Engine = ({ formData, setFormData }) => {
     return (
         <FormSection title="选择训练引擎">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 col-span-2">
-                <Card title="LlamaFactory" description="All-in-one LLM fine-tuning framework." selected={engine === 'LlamaFactory'} onSelect={(val) => setFormData(f => ({...f, engine: val}))} />
-                <Card title="Unsloth" description="High-performance fine-tuning with 2x speed." selected={engine === 'Unsloth'} onSelect={(val) => setFormData(f => ({...f, engine: val}))} />
-                <Card title="TRL" description="Transformer Reinforcement Learning for DPO, PPO etc." selected={engine === 'TRL'} onSelect={(val) => setFormData(f => ({...f, engine: val}))}>
+                <Card title="LlamaFactory" description="All-in-one LLM fine-tuning framework." selected={engine === 'LlamaFactory'} onSelect={(val) => setFormData(f => ({ ...f, engine: val }))} />
+                <Card title="Unsloth" description="High-performance fine-tuning with 2x speed." selected={engine === 'Unsloth'} onSelect={(val) => setFormData(f => ({ ...f, engine: val }))} />
+                <Card title="TRL" description="Transformer Reinforcement Learning for DPO, PPO etc." selected={engine === 'TRL'} onSelect={(val) => setFormData(f => ({ ...f, engine: val }))}>
                     {engine === 'TRL' && (
-                        <SelectField label="" options={['DPO', 'PPO', 'KTO', 'ORPO', 'GRPO']} value={trlMethod} onChange={e => setFormData(f => ({...f, trlMethod: e.target.value}))}/>
+                        <SelectField label="" options={['DPO', 'PPO', 'KTO', 'ORPO', 'GRPO']} value={trlMethod} onChange={e => setFormData(f => ({ ...f, trlMethod: e.target.value }))} />
                     )}
                 </Card>
-                <Card title="VERL" description="Vector-based Environment for RL." selected={engine === 'VERL'} onSelect={(val) => setFormData(f => ({...f, engine: val}))} />
+                <Card title="VERL" description="Vector-based Environment for RL." selected={engine === 'VERL'} onSelect={(val) => setFormData(f => ({ ...f, engine: val }))} />
             </div>
         </FormSection>
     );
@@ -104,7 +104,7 @@ const Step2_Data = ({ formData, setFormData }) => {
             return { ...f, datasets: newDatasets };
         });
     };
-    
+
     const handleAddDataset = () => {
         setFormData(f => ({ ...f, datasets: [...f.datasets, { id: Date.now(), name: datasetVersions[0], type: 'SFT', ratio: '0.0' }] }));
     };
@@ -113,7 +113,7 @@ const Step2_Data = ({ formData, setFormData }) => {
         if (datasets.length <= 1) return; // Prevent removing the last item
         setFormData(f => ({ ...f, datasets: f.datasets.filter(d => d.id !== id) }));
     };
-    
+
     // SFT / Pre-training Configuration (for LlamaFactory, Unsloth)
     const renderSFTConfig = () => {
         const sftPretrainRatioSum = formData.datasets
@@ -133,11 +133,11 @@ const Step2_Data = ({ formData, setFormData }) => {
                             <SelectField label="" options={['SFT', 'Pre-training', 'Validation']} value={dataset.type} onChange={e => handleDatasetChange(dataset.id, 'type', e.target.value)} />
                         </div>
                         <div className="col-span-3">
-                            <InputField 
-                                label="" 
-                                placeholder="Ratio" 
-                                type="number" 
-                                value={dataset.ratio} 
+                            <InputField
+                                label=""
+                                placeholder="Ratio"
+                                type="number"
+                                value={dataset.ratio}
                                 onChange={e => handleDatasetChange(dataset.id, 'ratio', e.target.value)}
                                 disabled={dataset.type === 'Validation'}
                                 description={dataset.type === 'Validation' ? 'N/A' : (dataset.type === 'SFT' ? 'e.g., 0.8' : 'e.g., 0.2')}
@@ -153,12 +153,12 @@ const Step2_Data = ({ formData, setFormData }) => {
                     </div>
                 ))}
                 <button onClick={handleAddDataset} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg hover:bg-indigo-100">
-                     <Icon path={ICONS.plus} className="w-4 h-4" />
+                    <Icon path={ICONS.plus} className="w-4 h-4" />
                     添加数据集
                 </button>
-                 <div className="col-span-2 mt-4 pt-4 border-t border-gray-200 text-right">
+                <div className="col-span-2 mt-4 pt-4 border-t border-gray-200 text-right">
                     <p className="text-sm font-medium text-gray-700">
-                        SFT/Pre-training Ratio Sum: 
+                        SFT/Pre-training Ratio Sum:
                         <span className={`font-bold ${isRatioInvalid ? 'text-red-600' : 'text-gray-900'}`}>
                             {sftPretrainRatioSum.toFixed(2)} / 1.00
                         </span>
@@ -181,13 +181,13 @@ const Step2_Data = ({ formData, setFormData }) => {
             <InputField label="验证集比例" placeholder="0.01" description="用于评估的验证集数据占比。" />
         </>
     );
-    
+
     const renderGenericConfig = () => (
-         <>
+        <>
             <SelectField label="数据集版本" options={datasetVersions} colSpan="col-span-2" description="为该引擎选择一个合适的数据集。" />
         </>
     );
-    
+
     const getConfigComponent = () => {
         switch (engine) {
             case 'LlamaFactory':
@@ -196,7 +196,7 @@ const Step2_Data = ({ formData, setFormData }) => {
             case 'TRL':
                 return renderRLHFConfig();
             case 'VERL':
-                 return renderGenericConfig();
+                return renderGenericConfig();
             default:
                 return renderSFTConfig();
         }
@@ -204,7 +204,7 @@ const Step2_Data = ({ formData, setFormData }) => {
 
     return (
         <FormSection title="数据配置">
-             {getConfigComponent()}
+            {getConfigComponent()}
         </FormSection>
     );
 };
@@ -225,7 +225,7 @@ const Step3_Parameters = ({ formData, setFormData }) => {
                     <Card title="QLoRA" description="Quantized LoRA" selected={params.tuningMethod === 'QLoRA'} onSelect={() => handleParamChange('tuningMethod', 'QLoRA')} />
                 </div>
             </div>
-            
+
             {(params.tuningMethod === 'LoRA' || params.tuningMethod === 'QLoRA') && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                     <InputField label="LoRA Rank (r)" value={params.lora_r} onChange={e => handleParamChange('lora_r', e.target.value)} />
@@ -233,7 +233,7 @@ const Step3_Parameters = ({ formData, setFormData }) => {
                     <InputField label="LoRA Dropout" value={params.lora_dropout} onChange={e => handleParamChange('lora_dropout', e.target.value)} />
                 </div>
             )}
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-200">
                 <InputField label="Learning Rate" placeholder="e.g., 2e-5" value={params.learning_rate} onChange={e => handleParamChange('learning_rate', e.target.value)} />
                 <InputField label="Batch Size" placeholder="e.g., 4" value={params.batch_size} onChange={e => handleParamChange('batch_size', e.target.value)} />
@@ -243,11 +243,11 @@ const Step3_Parameters = ({ formData, setFormData }) => {
             </div>
         </div>
     );
-    
+
     const renderRLHFParameters = () => (
         <div className="col-span-2 space-y-6">
             <h4 className="text-md font-semibold text-gray-700">{formData.trlMethod} 参数配置</h4>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <InputField label="Learning Rate" placeholder="e.g., 5e-7" value={params.learning_rate} onChange={e => handleParamChange('learning_rate', e.target.value)} />
                 <InputField label="Batch Size" placeholder="e.g., 2" value={params.batch_size} onChange={e => handleParamChange('batch_size', e.target.value)} />
                 <InputField label="Beta (β)" placeholder="0.1" description="The KL divergence regularization strength." value={params.dpo_beta} onChange={e => handleParamChange('dpo_beta', e.target.value)} />
@@ -260,7 +260,7 @@ const Step3_Parameters = ({ formData, setFormData }) => {
     );
 
     return (
-         <FormSection title="参数组">
+        <FormSection title="参数组">
             {formData.engine === 'TRL' ? renderRLHFParameters() : renderSFTParameters()}
         </FormSection>
     );
@@ -279,19 +279,19 @@ const Step5_Tracking = ({ formData, setFormData }) => (
     <FormSection title="追踪与产物">
         <SelectField label="实验追踪" options={['SwanLab', 'W&B', 'None']} />
         <InputField label="Artifacts 路径" placeholder="/mnt/artifacts/my-training-run" colSpan="col-span-2" />
-        <InputField label="任务名称" placeholder="e.g., llama3-sft-v1" colSpan="col-span-2"/>
+        <InputField label="任务名称" placeholder="e.g., llama3-sft-v1" colSpan="col-span-2" />
     </FormSection>
 );
 
 
-export const NewTrainingWizard = ({ isOpen, onClose }) => {
+export const NewTrainingWizard = ({ isOpen, onClose, initialDatasetName = null }) => {
     if (!isOpen) return null;
-    
+
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ 
-        engine: 'LlamaFactory', 
+    const [formData, setFormData] = useState({
+        engine: 'LlamaFactory',
         trlMethod: 'DPO',
-        datasets: [{ id: Date.now(), name: 'alpaca-gpt4-zh/v1.2', type: 'SFT', ratio: '1.0' }],
+        datasets: [{ id: Date.now(), name: initialDatasetName || 'alpaca-gpt4-zh/v1.2', type: 'SFT', ratio: '1.0' }],
         params: {
             tuningMethod: 'LoRA',
             learning_rate: '2e-5',
@@ -310,9 +310,18 @@ export const NewTrainingWizard = ({ isOpen, onClose }) => {
         },
     });
 
+    useEffect(() => {
+        if (initialDatasetName) {
+            setFormData(f => ({
+                ...f,
+                datasets: [{ id: Date.now(), name: initialDatasetName, type: 'SFT', ratio: '1.0' }]
+            }));
+        }
+    }, [initialDatasetName]);
+
     const handleNext = () => setStep(s => Math.min(s + 1, steps.length));
     const handleBack = () => setStep(s => Math.max(s - 1, 1));
-    
+
     const renderStepContent = () => {
         switch (step) {
             case 1: return <Step1_Engine formData={formData} setFormData={setFormData} />;
@@ -338,13 +347,13 @@ export const NewTrainingWizard = ({ isOpen, onClose }) => {
                     {renderStepContent()}
                 </main>
                 <footer className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
-                     <button onClick={onClose} className="text-sm font-semibold text-gray-600 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">取消</button>
+                    <button onClick={onClose} className="text-sm font-semibold text-gray-600 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">取消</button>
                     <div className="flex items-center gap-3">
                         {step > 1 && <button onClick={handleBack} className="text-sm font-semibold text-gray-600 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">上一步</button>}
                         {step < steps.length ? (
-                             <button onClick={handleNext} className="text-sm font-semibold text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 shadow-sm">下一步</button>
+                            <button onClick={handleNext} className="text-sm font-semibold text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 shadow-sm">下一步</button>
                         ) : (
-                             <button onClick={onClose} className="text-sm font-semibold text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 shadow-sm">创建任务</button>
+                            <button onClick={onClose} className="text-sm font-semibold text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 shadow-sm">创建任务</button>
                         )}
                     </div>
                 </footer>
